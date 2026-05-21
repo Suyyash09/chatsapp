@@ -8,14 +8,31 @@ import MessagesLoadingSkeleton from "./MessagesLoadSkeleton";
 // import SpaceBackGround from "./SpaceBackground";
 
 function ChatContainer() {
-  const { selectedUser, getMessagesByUserId, messages, isMessagesLoading } =
-    useChatStore();
+  const {
+    selectedUser,
+    getMessagesByUserId,
+    messages,
+    isMessagesLoading,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
-  }, [selectedUser._id, getMessagesByUserId]);
+    subscribeToMessages(selectedUser._id);
+
+    // clean up
+    return () => {
+      unsubscribeFromMessages(selectedUser._id);
+    };
+  }, [
+    selectedUser._id,
+    getMessagesByUserId,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
 
   useEffect(() => {
     if (messageEndRef.current) {
